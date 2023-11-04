@@ -1,0 +1,281 @@
+{% load static %}
+{% load bootstrap5 %}
+
+{% bootstrap_messages %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="{% static 'admin_panel/imgs/apple (1).png' %}">
+  <title> MyFruitShop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'admin_panel/AdminLTE/plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+  <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'admin_panel/AdminLTE/dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.9.0/dist/sweetalert2.min.css">
+</head>
+<body class="layout-top-nav">
+<!-- Site wrapper -->
+<div class="wrapper">
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-white navbar-light">
+    <div class="container-fluid mr-3 ml-3">
+      <div class="col-sm-12 col-md-6  mb-3 mb-md-0 text-center text-md-left">
+        <h1 class="">MyFruitShop <i class="fa-solid fa-apple-whole fa-flip" style="color: #02ed2a;"></i> </h1>
+      </div>
+      <div class="col-sm-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-end">
+          {% if not request.user.is_authenticated %}
+              <form action="{% url 'login' %}" method="post">
+              {% csrf_token %}
+                    <div class="d-flex flex-row align-items-center">
+                        <div class="d-flex align-items-center mr-1">
+                            <label for="exampleInputEmail1"></label>{{ form.username }}
+
+                        </div>
+                        <div class="d-flex align-items-center mr-1">
+                            <label for="exampleInputPassword1"></label>{{ form.password }}
+
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill">Login</button>
+                    </div>
+              </form>
+          {% else %}
+              <form action="{% url 'logout' %}" method="post">
+                  {% csrf_token %}
+                    <div class="d-flex flex-row align-items-center">
+                        <div class="d-flex align-items-center mr-3">
+                            <img src="{% static 'admin_panel/imgs/user-solid.svg' %}" style="width: 20px;height: 20px" alt="">
+                        </div>
+                        <div class="d-flex align-items-center mr-3">
+                            {{ request.user.last_name }}
+                        </div>
+                        <div class="d-flex align-items-center mr-5">
+                            {{ request.user.first_name }}
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill">Logout</button>
+                    </div>
+              </form>
+          {% endif %}
+      </div>
+    </div>
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header pt-2">
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+        <div class="col-md-8 ">
+            <div class="card card-white">
+                <div class="card-header d-flex justify-content-center">
+                    <h3 class="card-title">Товары на складе</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="align-middle">Название</th>
+                                <th class="align-middle" style="min-width: 150px">Текущее кол-во</th>
+                                <th class="align-middle">Действия</th>
+                                <th class="align-middle" style="min-width: 150px">Последняя операция</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fruit in fruits %}
+                                <tr class="text-center fruit">
+                                    <td class="align-middle">{{ fruit.name }}</td>
+                                    <td class="align-middle fruit_amount">{{ fruit.amount }}</td>
+                                    <td class="align-middle">
+                                        <div class="d-flex flex-row align-items-center trading_btn">
+                                            <div class="d-flex align-items-center mr-1">
+                                                <label for="fruit_{{ forloop.counter }}"></label><input type="number" min="0" value="" class="form-control store_input" style="min-width: 80px;" id="fruit_{{ forloop.counter }}" data-id="{{ fruit.id }}" placeholder="кол-во">
+                                            </div>
+                                            <button type="submit" class="btn btn-success rounded-pill mr-1 btn_buy">Купить</button>
+                                            <button type="submit" class="btn btn-warning rounded-pill btn_sell">Продать</button>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle fruit_last_operation">
+                                        {% if  fruit.operations.all.count > 0 %}
+                                            {{ fruit.operations.all.0.timestamp|date:'d-m-Y H:i' }} - {{ fruit.operations.all.0 }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-6">
+                    <div class="card card-white direct-chat direct-chat-primary pr-0 pl-0">
+                        <div class="card-header">
+                            <h3 class="card-title">Чат Общение</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="direct-chat-messages communication-chat" style="height: 440px;  overflow-y: scroll">
+                                {% for chat_message in chat_messages %}
+                                    <div class="direct-chat-msg">
+                                        <div class="direct-chat-infos clearfix">
+                                            <span class="direct-chat-name float-left">{{ chat_message.user.last_name }} {{ chat_message.user.first_name }}</span>
+                                            <span class="direct-chat-timestamp float-right">{{ chat_message.timestamp|date:'H:i:s' }}</span>
+                                        </div>
+
+                                        <img class="direct-chat-img" src="{% static 'admin_panel/imgs/user-solid.svg' %}" alt="Message User Image">
+
+                                        <div class="direct-chat-text">
+                                            {{ chat_message.content }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                                <div class="d-flex">
+                                    <input type="text" name="message" placeholder="Текст сообщения" class="form-control mr-2 msg-input">
+                                    <span class="">
+                                        <button class="btn btn-primary rounded-pill send-msg">Отправить</button>
+                                    </span>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                     <div class="card card-white">
+                          <div class="card-header d-flex justify-content-center">
+                            <h3 class="card-title">БАНК</h3>
+                            <!-- /.card-tools -->
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <div class="row text-center mb-4">
+                                <div class="col-6 d-flex align-items-center justify-content-center">
+                                    <h5>Банковский счёт:   </h5>
+                                </div>
+                                <div class="col-6 d-flex align-items-center justify-content-center">
+                                    <h5 class=""><span class="balance_view">{{ balance }}</span> USD</h5>
+                                </div>
+                            </div>
+                            <div class="row mb-5" style="align-items:center;">
+                                <div class="col-sm-12 mb-3 d-flex justify-content-center align-content-center">
+                                    <button  class="btn btn-danger audit_btn" style="border-radius: 50px; min-width: 180px">Провести бух аудит</button>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="progress" style="margin: auto;max-width: 250px">
+                                      <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger fs-6 fw-bold" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style=""></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-5">
+                                <div class="row">
+                                    <div class="col-sm-12 mb-3">
+                                        <div class="d-flex justify-content-center">
+                                            <label for="exampleInputBalance"></label><input type="number" class="form-control" style="min-width: 150px;max-width: 220px" id="exampleInputBalance" placeholder="сумма">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 d-flex flex-row justify-content-center balance_btn">
+                                        <div class="">
+                                            <button type="submit" class="btn btn-success rounded-pill mr-3 plus_btn">Пополнить</button>
+                                        </div>
+                                        <div class="">
+                                            <button type="submit" class="btn btn-warning rounded-pill minus_btn">Вывести</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                              <div class="row">
+                                   <form action="" novalidate class="declaration_form" method="post" enctype="multipart/form-data">
+                                       {% csrf_token %}
+                                       {{ declaration_form }}
+                                        <div class="row">
+                                            <div class="col-sm-12 mb-sm-3">
+                                                <div class="d-flex justify-content-center">
+                                                    <div class="btn btn-primary rounded-pill declaration_btn" style="; min-width: 180px">Загрузить декларации</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 d-flex flex-row justify-content-center align-items-center">
+                                               <span>Сегодня загружено: <span class="uploaded_count">{{ declaration_count }}</span>  шт.</span>
+                                            </div>
+                                        </div>
+                                  </form>
+                              </div>
+                          </div>
+                      <!-- /.card-body -->
+                      </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-white direct-chat direct-chat-primary pr-0 pl-0" >
+                <div class="card-header">
+                    <h3 class="card-title">Последние операции</h3>
+                </div>
+                <div class="card-body">
+                    <div class="direct-chat-messages last_operations" style="height: 867px;overflow-y: scroll;  ">
+                        {% for operation in operations %}
+                            <div  class="direct-chat-msg  {% if operation.status == 'SUCCESS' %}bg-success{% else %}bg-danger{% endif %} border p-2 rounded-3" >
+                                <div class="direct-chat-infos clearfix">
+                                    <span class="direct-chat-name float-left">{{ operation.status }}</span>
+                                    <span class="direct-chat-timestamp float-right text-white">{{ operation.timestamp|date:'d-m-Y H:i'}}</span>
+                                </div>
+                                <div class="">
+                                    {{ operation }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <footer class="main-footer">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 1.0
+    </div>
+    <strong>Copyright &copy; 2023 <a href="#">MyFruitShop</a>.</strong> All rights reserved.
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.9.0/dist/sweetalert2.all.min.js"></script>
+<!-- ./wrapper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/cce590ac92.js" crossorigin="anonymous"></script>
+<script>
+    let avatar = '{% static 'admin_panel/imgs/user-solid.svg' %}'
+    let authenticated = "{{ request.user.is_authenticated }}";
+</script>
+
+<!-- AdminLTE App -->
+<script src="{% static 'admin_panel/AdminLTE/dist/js/adminlte.min.js' %}"></script>
+<script src="{% static 'admin_panel/main.js' %}"></script>
+
+<!-- AdminLTE for demo purposes -->
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+FROM python:3.10-alpine
+
+WORKDIR /usr/src/MyFruitShop
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apk update \
+    && apk add postgresql gcc python3-dev musl-dev supervisor
+
+
+RUN pip install --upgrade pip
+
+COPY . .
+
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
+#RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/MyFruitShop/wheels -r requirements.txt
+
+#FROM python:3.10
+
+RUN mkdir -p /home/MyFruitShop
+
+RUN addgroup -S MyFruitShop && adduser -S MyFruitShop -G MyFruitShop
+
+
+
+ENV HOME=/home/MyFruitShop
+ENV MyFruitShop_HOME=/home/MyFruitShop/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
+RUN mkdir $APP_HOME/media
+
+WORKDIR $APP_HOME
+
+RUN apt-get update \
+    && apt-get install -y netcat
+
+#COPY --from=builder /usr/src/MyFruitShop/wheels /wheels
+#COPY --from=builder /usr/src/MyFruitShop/requirements.txt .
+#RUN pip install --no-cache /wheels/*
+
+COPY ./entrypoint.sh $APP_HOME
+
+COPY . $APP_HOME
+
+COPY supervisor/supervisor.conf /etc/supervisor/conf.d/
+RUN mkdir /run/daphne/
+RUN chown MyFruitShop:MyFruitShop /run/daphne/
+RUN mkdir /usr/lib/tmpfiles.d/daphne.conf
+
+
+RUN chown -R MyFruitShop:MyFruitShop $APP_HOME
+
+RUN ln -s /mnt/volume_fra1_01 local_storage
+
+
+RUN chmod +x /home/MyFruitShop/web/entrypoint.sh
+
+USER MyFruitShop
+
+ENTRYPOINT ["/home/MyFruitShop/web/entrypoint.sh"]

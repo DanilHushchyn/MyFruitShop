@@ -1,0 +1,50 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    command:  uvicorn MyFruitShop.asgi:application --host 0.0.0.0 --port 8000
+    volumes:
+      - static_volume:/usr/src/MyFruitShop/static
+      - media_volume:/usr/src/MyFruitShop/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=danil
+      - POSTGRES_PASSWORD=danil
+      - POSTGRES_DB=fruit_shop
+  redis:
+    image: redis:alpine
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A MyFruitShop worker -Q trading_queue,celery -l  info --concurrency=1
+    volumes:
+      - .:/usr/src/MyFruitShop/
+    depends_on:
+      - db
+      - redis
+      - web
+  celery-beat:
+    restart: always
+    build:
+      context: .
+    command: celery -A MyFruitShop beat
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - celery
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

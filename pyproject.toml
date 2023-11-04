@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "myfruitshop"
+version = "0.1.0"
+description = ""
+authors = ["dhushchyn <dhushchyn@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django-environ = "^0.11.2"
+psycopg2-binary = "^2.9.9"
+aioredis = "^2.0.1"
+channels = {extras = ["daphne"], version = "^4.0.0"}
+daphne = "^4.0.0"
+django-redis = "^5.4.0"
+celery = "^5.3.4"
+channels-redis = "^4.1.0"
+translators = "^5.8.7"
+jokeapi = "^1.0.5"
+translate = "^3.6.1"
+googletrans = "^3.0.0"
+pymorphy2 = "^0.9.1"
+django-bootstrap-v5 = "^1.0.11"
+supervisor = "^4.2.5"
+gunicorn = "^21.2.0"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
