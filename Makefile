@@ -32,10 +32,10 @@ poetry-to-txt:
 	poetry export --without-hashes --format=requirements.txt > requirements.txt
 
 
-docker-build:
+dock-build:
 	sudo docker-compose -f docker-compose.yml build
 
-docker-up:
+dock-up:
 	sudo docker-compose -f docker-compose.yml up
 
 down:
