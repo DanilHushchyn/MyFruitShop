@@ -17,7 +17,7 @@ let chatInput = $('.msg-input')
 chat[0].scrollTo(10, chat[0].scrollHeight);
 let socket = new WebSocket(
         'ws://'
-        + window.location.host
+        + '127.0.0.1:8000'
         + '/ws/chat/'
     );
 
@@ -73,7 +73,7 @@ let balanceBtn = $('.balance_btn')
 let balanceInput = $('#exampleInputBalance')
 let balance_socket = new WebSocket(
         'ws://'
-        + window.location.host
+        + '127.0.0.1:8000'
         + '/ws/balance/'
 );
 balance_socket.onmessage = (e) => {
@@ -121,7 +121,7 @@ let progressBar = $('.progress-bar')
 let audit_running = false
 let audit_socket = new WebSocket(
         'ws://'
-        + window.location.host
+        + '127.0.0.1:8000'
         + '/ws/audit/'
 );
 $('.audit_btn').on('click',function () {
@@ -174,7 +174,7 @@ storeInput.bind('keyup', function(e) {
 let tradingBtn = $('.trading_btn')
 let store_socket = new WebSocket(
         'ws://'
-        + window.location.host
+        + '127.0.0.1:8000'
         + '/ws/store/'
 );
 tradingBtn.on('click','.btn_buy, .btn_sell',function () {

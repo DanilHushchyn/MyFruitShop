@@ -3,6 +3,7 @@ version: '3.3'
 services:
   web:
     build: .
+#    command: daphne MyFruitShop.asgi:application
     command:  uvicorn MyFruitShop.asgi:application --host 0.0.0.0 --port 8000
     volumes:
       - static_volume:/usr/src/MyFruitShop/static
@@ -23,26 +24,15 @@ services:
       - POSTGRES_DB=fruit_shop
   redis:
     image: redis:alpine
-  celery:
-    restart: always
-    build:
-      context: .
-    command: celery -A MyFruitShop worker -Q trading_queue,celery -l  info --concurrency=1
+  nginx:
+    build: ./nginx
     volumes:
-      - .:/usr/src/MyFruitShop/
+      - static_volume:/usr/src/MyFruitShop/static
+      - media_volume:/usr/src/MyFruitShop/media
+    ports:
+      - "1337:80"
     depends_on:
-      - db
-      - redis
       - web
-  celery-beat:
-    restart: always
-    build:
-      context: .
-    command: celery -A MyFruitShop beat
-    env_file:
-      - ./.env.dev
-    depends_on:
-      - celery
 
 volumes:
   postgres_data:

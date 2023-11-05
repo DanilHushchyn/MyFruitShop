@@ -17,7 +17,7 @@ let chatInput = $('.msg-input')
 chat[0].scrollTo(10, chat[0].scrollHeight);
 let socket = new WebSocket(
         'ws://'
-        + '127.0.0.1:8000'
+        + window.location.host
         + '/ws/chat/'
     );
 
