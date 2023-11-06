@@ -3,8 +3,7 @@ version: '3.3'
 services:
   web:
     build: .
-#    command: daphne MyFruitShop.asgi:application
-    command:  uvicorn MyFruitShop.asgi:application --host 0.0.0.0 --port 8000
+    command:  uvicorn MyFruitShop.asgi:application --host 0.0.0.0 --port 8000 --workers 1
     volumes:
       - static_volume:/usr/src/MyFruitShop/static
       - media_volume:/usr/src/MyFruitShop/media
@@ -18,12 +17,8 @@ services:
     image: postgres:13.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=danil
-      - POSTGRES_PASSWORD=danil
-      - POSTGRES_DB=fruit_shop
-  redis:
-    image: redis:alpine
+    env_file:
+      - ./.env.prod.db
   nginx:
     build: ./nginx
     volumes:
@@ -33,7 +28,8 @@ services:
       - "1337:80"
     depends_on:
       - web
-
+  redis:
+    image: redis:alpine
 volumes:
   postgres_data:
   static_volume:

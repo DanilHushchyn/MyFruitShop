@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 WSGI_APPLICATION = 'MyFruitShop.wsgi.application'
 ASGI_APPLICATION = 'MyFruitShop.asgi.application'
 
-
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 # Django-Redis needs to be installed first
 # pip install --upgrade django-redis
 
