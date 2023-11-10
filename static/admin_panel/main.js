@@ -232,6 +232,7 @@ store_socket.onmessage = (e) => {
         </div>
     `)
     $('.last_operations').prepend(newElement)
+    $('.last_operations').children().last().remove()
     if (status === 'ERROR'){
         if(crontab === false) {
             toastr.error(`${full_message}`)
