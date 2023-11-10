@@ -275,6 +275,13 @@ declarationFile.on('change',function () {
           console.log('JSON parse undefined:', e);
         }
        $('.uploaded_count').html(count)
+          Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'Декларация успешно загружена',
+          showConfirmButton: false,
+          timer: 1500
+        })
       },
       error: function(xhr, status, error) {
         console.error('Declaration error');
