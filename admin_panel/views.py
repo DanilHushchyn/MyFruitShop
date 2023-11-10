@@ -49,3 +49,4 @@ class UploadDeclarationView(View):
             'count': count
         }
         return JsonResponse(json.dumps(data), safe=False)
+

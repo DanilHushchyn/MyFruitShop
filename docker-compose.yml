@@ -3,7 +3,7 @@ version: '3.3'
 services:
   web:
     build: .
-    command:  uvicorn MyFruitShop.asgi:application --host 0.0.0.0 --port 8000 --workers 1
+    command:  uvicorn MyFruitShop.asgi:application --host 0.0.0.0 --port 8000
     volumes:
       - static_volume:/usr/src/MyFruitShop/static
       - media_volume:/usr/src/MyFruitShop/media
@@ -30,6 +30,41 @@ services:
       - web
   redis:
     image: redis:alpine
+  worker1:
+    image: celery
+    restart: always
+    build:
+      context: .
+    command: celery -A MyFruitShop worker -Q trading_queue -l  info --concurrency=1
+    # Add your Celery worker 1 configuration here
+    volumes:
+      - .:/usr/src/MyFruitShop
+    depends_on:
+      - db
+      - redis
+      - web
+  worker2:
+    image: celery
+    restart: always
+    build:
+      context: .
+    command: celery -A MyFruitShop worker -Q celery -l  info --concurrency=4
+    volumes:
+      - .:/usr/src/MyFruitShop
+    depends_on:
+      - db
+      - redis
+      - web
+  celery-beat:
+    restart: always
+    build:
+      context: .
+    command: celery -A MyFruitShop beat
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - worker1
+      - worker2
 volumes:
   postgres_data:
   static_volume:

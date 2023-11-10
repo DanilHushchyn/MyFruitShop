@@ -14,7 +14,7 @@ superuser:
 	$(MANAGE) createsuperuser
 
 worker:
-	celery -A MyFruitShop worker -Q trading_queue,celery -l  info --concurrency=1
+	celery -A MyFruitShop worker -Q celery,trading_queue -l  info --concurrency=4
 beat:
 	celery -A MyFruitShop beat
 

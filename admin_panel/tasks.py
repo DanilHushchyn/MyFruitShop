@@ -6,9 +6,11 @@ import httpx
 from asgiref.sync import async_to_sync
 from celery import current_task
 from channels.layers import get_channel_layer
+from django.core.cache import cache
 
 from MyFruitShop.celery import app
 from admin_panel import models
+from admin_panel.models import ChatMessage
 
 
 @app.task(bind=True)
@@ -16,13 +18,13 @@ def fruits_trading(self, name, start, end, status):
     fruit = models.FruitStorage.objects.get(name=name)
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        'store_store',
+        "store_store",
         {
             'type': 'receive',
-            'crontab': True,
             'status': status,
             'id': fruit.id,
             'amount': random.randint(start, end),
+            'crontab': True,
         }
     )
 
@@ -45,30 +47,35 @@ def joke(self):
     response = httpx.get('https://v2.jokeapi.dev/joke/Any?type=single')
     joke = response.json().get('joke')
     channel_layer = get_channel_layer()
+    message = ChatMessage.objects.create(
+        user_id=33,
+        content=joke
+    )
+    ChatMessage.objects.last().delete()
     async_to_sync(channel_layer.group_send)(
-        'chat_chat',
-        {
-            "type": "chat_message",
-            "message": joke,
-
-        }
+        "chat_chat", {"type": "chat.msg", "message": {
+            'content': message.content,
+            'user': message.user.last_name + message.user.first_name,
+            'timestamp': message.timestamp.isoformat(),
+        }}
     )
 
 
 @app.task(bind=True)
-def account_audit(self):
+def account_audit(self,user_id):
     channel_layer = get_channel_layer()
     for i in range(1, 16):
         time.sleep(1)
         self.update_state(state='PROGRESS',
                           meta={'current': i, 'total': 15})
-
         async_to_sync(channel_layer.group_send)(
-            'bank_bank',
+            f'accounting_audit_{user_id}',
             {
                 "type": "progress",
+                "status": True,
                 "progress_percent": (i * 100) / 15,
 
             }
         )
+    cache.delete(f'user_{user_id}')
     return {'current': 100, 'total': 100}

@@ -22,20 +22,20 @@ let socket = new WebSocket(
     );
 
 socket.onmessage = (e) => {
-    let messages = JSON.parse(e.data)['messages'];
+    let message = JSON.parse(e.data)['message'];
     let element;
-    let message;
-    chat.empty()
-    for (let key in messages){
-        message = messages[key]
+    // let message;
+    // chat.empty()
+    // for (let key in messages){
+    //     message = messages[key]
         element = $(`
         <div class="direct-chat-msg">
             <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-left"> ${message["user__last_name"]} ${message["user__first_name"]}</span>
+                <span class="direct-chat-name float-left"> ${message["user"]}</span>
                 <span class="direct-chat-timestamp float-right"> ${new Date(message['timestamp']).toLocaleTimeString('ru-RU',{
-                    "hour":'numeric', 
-                    "minute":'numeric', 
-                    "second":'numeric', 
+                    "hour":'numeric',
+                    "minute":'numeric',
+                    "second":'numeric',
                 }) }
 
                 </span>
@@ -49,7 +49,8 @@ socket.onmessage = (e) => {
         </div>
         `)
         chat.append(element)
-    }
+        chat.children().first().remove()
+    // }
     chat[0].scrollTo(10, chat[0].scrollHeight);
 }
 socket.onclose = (e) => {
@@ -128,7 +129,25 @@ $('.audit_btn').on('click',function () {
     if(check_authenticated() === false){
         return;
     }
-    if(audit_running){
+    // if(audit_running){
+    //     Swal.fire({
+    //       position: 'center',
+    //       icon: 'error',
+    //       title: 'Ждём окончания аудита',
+    //       showConfirmButton: false,
+    //       timer: 1500
+    //     })
+    //     return;
+    // }
+    // audit_running=true
+    audit_socket.send(JSON.stringify(
+        {}
+    ))
+})
+audit_socket.onmessage = (e) => {
+    let percent = parseInt(JSON.parse(e.data)['percent'],10);
+    let status = JSON.parse(e.data)['status'];
+    if(status===false){
         Swal.fire({
           position: 'center',
           icon: 'error',
@@ -138,13 +157,6 @@ $('.audit_btn').on('click',function () {
         })
         return;
     }
-    audit_running=true
-    audit_socket.send(JSON.stringify(
-        {}
-    ))
-})
-audit_socket.onmessage = (e) => {
-    let percent = parseInt(JSON.parse(e.data)['percent'],10);
     progressBar.width(percent + "%").attr('aria-valuenow',percent);
     progressBar.html(percent + "%")
     if(percent===100){
@@ -156,7 +168,7 @@ audit_socket.onmessage = (e) => {
           timer: 1500
         })
         progressBar.width(0 + "%").attr('aria-valuenow',0)
-        audit_running=false
+        // audit_running=false
 
     }
 }
@@ -196,11 +208,12 @@ tradingBtn.on('click','.btn_buy, .btn_sell',function () {
             'amount' : amount,
         }
     ))
-
 })
 store_socket.onmessage = (e) => {
     let id = JSON.parse(e.data)['operation']['fruit_id']
     let crontab = JSON.parse(e.data)['crontab']
+    let operation_count = JSON.parse(e.data)['count']
+    $('.uploaded_count').html(operation_count)
     let timestamp = JSON.parse(e.data)['operation']['timestamp']
     let message = JSON.parse(e.data)['operation']['message']
     let status = JSON.parse(e.data)['operation']['status']
@@ -261,9 +274,6 @@ declarationFile.on('change',function () {
           console.log('JSON parse undefined:', e);
         }
        $('.uploaded_count').html(count)
-          console.log(count)
-       $('.uploaded_count').html(response['count'])
-          console.log(response['count'])
       },
       error: function(xhr, status, error) {
         console.error('Declaration error');

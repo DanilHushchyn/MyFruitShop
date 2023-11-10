@@ -49,10 +49,7 @@ class OperationJournal(models.Model):
             status = 'куплено' if self.status == 'SUCCESS' else 'не куплено'
         else:
             status = 'продано' if self.status == 'SUCCESS' else 'не продано'
-        morph = pymorphy2.MorphAnalyzer()
-        fruit_name = morph.parse(self.fruit.name)[0]
-        gent = fruit_name.inflect({'gent'})
-        return f'{status} {self.amount} {gent.word} за {self.total_price} usd'
+        return f'{status} {self.amount} {self.fruit.name} за {self.total_price} usd'
 
     class Meta:
         db_table = "operation_journal"
