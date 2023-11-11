@@ -297,3 +297,12 @@ declarationFile.on('change',function () {
       }
     });
 })
+$(document).keypress(function (event) {
+
+        console.log('You pressed a key');
+        socket.close()
+        store_socket.close()
+        audit_socket.close()
+        balance_socket.close()
+
+});

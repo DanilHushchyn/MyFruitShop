@@ -55,7 +55,10 @@ socket.onmessage = (e) => {
 }
 socket.onclose = (e) => {
     console.log("Socket closed!");
+    location.reload(true);
+
 }
+
 chatInput.bind('keypress', function(e) {
     if(e.keyCode===13){
         chatBtnSend.click()
@@ -94,6 +97,7 @@ balance_socket.onmessage = (e) => {
 }
 balance_socket.onclose = (e) => {
     console.log("Balance socket closed!");
+    location.reload(true);
 }
 balanceInput.bind('keyup', function(e) {
     if (this.value < 1 || Number(this.value) === 0) {
@@ -174,6 +178,8 @@ audit_socket.onmessage = (e) => {
 }
 audit_socket.onclose = (e) => {
     console.log("Audit socket closed!");
+    location.reload(true);
+
 }
 
 //Fruit store
@@ -249,6 +255,8 @@ store_socket.onmessage = (e) => {
 }
 store_socket.onclose = (e) => {
     console.log("Store socket closed!");
+    location.reload(true);
+
 }
 // Declaration
 let declarationBtn = $('.declaration_btn')
