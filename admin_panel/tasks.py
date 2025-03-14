@@ -53,7 +53,7 @@ def get_abcex_rate():
                 .find_element(By.TAG_NAME, "div")
                 )
         latest_price = elem.get_attribute("innerHTML")
-        User.objects.all().update(address=latest_price)
+        print(latest_price)
     except Exception:
         print("Element not found.")
     finally:
