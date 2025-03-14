@@ -7,7 +7,9 @@ from asgiref.sync import async_to_sync
 from celery import current_task
 from channels.layers import get_channel_layer
 from django.core.cache import cache
-
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from MyFruitShop.celery import app
 from admin_panel import models
 from admin_panel.models import ChatMessage
