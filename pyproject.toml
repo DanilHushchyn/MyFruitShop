@@ -26,6 +26,7 @@ gunicorn = "^21.2.0"
 uvicorn = {extras = ["standard"], version = "^0.23.2"}
 twisted = {extras = ["http2", "tls"], version = "^23.10.0"}
 jsonpickle = "^3.0.2"
+selenium = "^4.29.0"
 
 
 [build-system]
