@@ -22,5 +22,9 @@ app.conf.beat_schedule = {
         'task': 'admin_panel.tasks.joke',
         'schedule': 15.0
     },
+    'get_abcex_every_minute': {
+        'task': 'admin_panel.tasks.get_abcex_rate',
+        'schedule': crontab(minute='*/1'),
+    },
 }
 app.conf.timezone = 'Europe/Kiev'
