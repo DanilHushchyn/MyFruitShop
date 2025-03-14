@@ -29,6 +29,37 @@ def fruits_trading(self, name, start, end, status):
     )
 
 
+@app.task
+def get_abcex_rate():
+    """Task for clearing blacklisted tokens in system
+    :return:
+    """
+    url = "https://abcex.io/#p2p"
+
+    options = Options()
+    options.add_argument("--headless")  # Включаем headless-режим
+    options.add_argument("--disable-gpu")  # Отключаем GPU (нужно для стабильности)
+    options.add_argument("--no-sandbox")  # Для работы в Docker
+    options.add_argument("--disable-dev-shm-usage")  # Уменьшает использование памяти
+
+    driver = webdriver.Firefox(options=options)
+    driver.set_page_load_timeout(15)  # Set timeout to 15 seconds
+    driver.get(url)
+    latest_price = None
+    try:
+        elem = (driver.find_element(By.CLASS_NAME, "ask")
+                .find_element(By.CLASS_NAME, 'order-book-track')
+                .find_element(By.CLASS_NAME, 'flex')
+                .find_element(By.TAG_NAME, "div")
+                )
+        latest_price = elem.get_attribute("innerHTML")
+        User.objects.all().update(address=latest_price)
+    except Exception:
+        print("Element not found.")
+    finally:
+        driver.quit()
+
+
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(6.0, fruits_trading.s('яблоки', 1, 10, 'buy'), name='buy every 6 apple')
